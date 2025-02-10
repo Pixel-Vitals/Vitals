@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Role</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="flex justify-center items-center h-screen bg-gray-100">
+  <div class="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
+    <h2 class="text-2xl font-bold text-gray-700 mb-4">Select Your Role</h2>
+    <p class="text-gray-600 mb-6">Choose your role to proceed:</p>
+
+    <button onclick="selectRole('patient')"
+      class="w-full bg-blue-500 text-white p-2 rounded mb-2 hover:bg-blue-600">🧑‍⚕️ Patient</button>
+    <button onclick="selectRole('doctor')"
+      class="w-full bg-green-500 text-white p-2 rounded mb-2 hover:bg-green-600">👨‍⚕️ Doctor</button>
+    <button onclick="selectRole('insurance')" class="w-full bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600">🏢
+      Insurance Company</button>
+  </div>
+
+  <script>
+    function selectRole(role) {
+      localStorage.setItem("userRole", role);
+      window.location.href = "/login";
+    }
+  </script>
+</body>
+
+</html>
