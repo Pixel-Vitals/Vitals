@@ -1,119 +1,105 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <title>Login</title>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import firebaseConfig from "/firebase-config.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    document.getElementById("login-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
-          const idToken = await user.getIdToken();
-
-          // Send token to server
-          fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: idToken }),
-          })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                window.location.href = "/dashboard";
-              } else {
-                alert("Authentication failed");
-              }
-            });
-        })
-        .catch(error => alert(error.message));
-    });
-  </script>
-</head>
-
-<body>
-  <h2>Login</h2>
-  <form id="login-form">
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Login</button>
-  </form>
-</body>
-<p>Don't have an account? <a href="/signup">Sign up here</a></p>
-
-
-</html> -->
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Home - Role Based System</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import firebaseConfig from "/firebase-config.js";
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    document.getElementById("login-form").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      signInWithEmailAndPassword(auth, email, password)
-        .then(async (userCredential) => {
-          const user = userCredential.user;
-          const idToken = await user.getIdToken();
-
-          // Send token to server
-          fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ token: idToken }),
-          })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                window.location.href = "/dashboard";
-              } else {
-                alert("Login failed");
-              }
-            });
-        })
-        .catch(error => alert(error.message));
-    });
-  </script>
 </head>
 
-<body class="flex justify-center items-center h-screen bg-gray-100">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-96">
-    <h2 class="text-2xl font-bold text-center text-gray-700">Login</h2>
-    <form id="login-form" class="mt-4">
-      <input type="email" id="email" placeholder="Email" class="w-full p-2 border rounded mt-2" required>
-      <input type="password" id="password" placeholder="Password" class="w-full p-2 border rounded mt-2" required>
-      <button type="submit" class="w-full bg-green-500 text-white p-2 rounded mt-4 hover:bg-green-600">Login</button>
-    </form>
-    <p class="text-center text-gray-600 mt-4">Don't have an account? <a href="/signup" class="text-blue-500">Sign up
-        here</a></p>
+<body class="bg-gray-100">
+
+  <!-- Navbar -->
+  <nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+      <div class="relative flex h-16 items-center justify-between">
+        <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+          <!-- Mobile menu button-->
+          <button type="button"
+            class="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-white focus:outline-hidden focus:ring-inset"
+            aria-controls="mobile-menu" aria-expanded="false">
+            <span class="absolute -inset-0.5"></span>
+            <span class="sr-only">Open main menu</span>
+            <!--
+              Icon when menu is closed.
+  
+              Menu open: "hidden", Menu closed: "block"
+            -->
+            <svg class="block size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+            </svg>
+            <!--
+              Icon when menu is open.
+  
+              Menu open: "block", Menu closed: "hidden"
+            -->
+            <svg class="hidden size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+              aria-hidden="true" data-slot="icon">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+          <div class="flex shrink-0 items-center">
+            <img class="h-10 w-auto rounded"
+              src="https://png.pngtree.com/png-clipart/20200727/original/pngtree-letter-p-pixel-logo-design-template-png-image_5334784.jpg"
+              alt="Your Company">
+          </div>
+          <div class="hidden sm:ml-6 sm:block">
+            <div class="flex space-x-4">
+              <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+              <a href="/login" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white"
+                aria-current="page">Patient</a>
+              <a href="/doctorlogin"
+                class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Doctor</a>
+              <a href="/company"
+                class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Company</a>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="sm:hidden" id="mobile-menu">
+          <div class="space-y-1 px-2 pt-2 pb-3">
+            <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+            <a href="/login" class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white"
+              aria-current="page">Patient</a>
+            <a href="/doctor"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Doctor</a>
+            <a href="/company"
+              class="block rounded-md px-3 py-2 text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Company</a>
+          </div>
+        </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mx-auto mt-16 flex flex-col md:flex-row items-center justify-center px-6 ">
+
+    <!-- Left: Image -->
+    <div class="w-full md:w-1/5">
+      <img
+        src="data:image/png;base64,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"
+        alt="" class="w-full h-auto rounded-lg shadow-lg">
+    </div>
+
+    <!-- Right: Text -->
+    <div class="w-full md:w-1/2 text-center md:text-left md:pl-12">
+      <h1 class="text-4xl font-bold text-gray-800">Trace your Vitals</h1>
+      <p class="text-gray-600 mt-4 text-lg">
+        Empowering lives with accessible, innovative, and compassionate healthcare solutions!
+      </p>
+      <div class="mt-6">
+        <a href="login" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700">
+          Get Started
+        </a>
+      </div>
+    </div>
+
   </div>
+
 </body>
 
 </html>

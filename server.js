@@ -32,17 +32,13 @@ app.set("views", path.join(__dirname, "views"));
 // Serve static files
 app.use(express.static("public"));
 
+async function isAuthenticated(req, res, next) {
+  if (!req.session.user) return res.redirect("/");
+  next();
+}
 
-
-
-// Render Role Selection Page
-app.get("/role-selection", (req, res) => {
-  res.render("role-selection");
-});
-
-// Redirect to Role Selection Before Login
 app.get("/", (req, res) => {
-  res.redirect("/role-selection");
+  res.render("index");
 });
 
 // Render Login Page
@@ -50,24 +46,58 @@ app.get("/login", (req, res) => {
   res.render("login");
 });
 
-
-
-
-
-// Routes
-app.get("/", (req, res) => {
-  res.render("index"); // Login page
+app.get("/doctorlogin", (req, res) => {
+  res.render("doctorlogin");
 });
+
+
+app.get("/company", (req, res) => {
+  res.render("companylogin");
+});
+
+app.get("/dashboard-doctor", (req, res) => {
+  res.render("dashboard-doctor");
+});
+
+app.get("/dashboard-insurance", (req, res) => {
+  res.render("dashboard-insurance");
+});
+
+app.post("/company", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.session.user = decodedToken;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+});
+
+app.post("/doctorlogin", async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.session.user = decodedToken;
+    res.json({ success: true });
+  } catch (error) {
+    res.status(401).json({ success: false, message: "Unauthorized" });
+  }
+});
+
+
 
 app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { user: req.session.user });
 });
 
+app.get("/show", isAuthenticated, (req, res) => {
+  res.render("show", { user: req.session.user });
+});
 // Authentication Middleware
-async function isAuthenticated(req, res, next) {
-  if (!req.session.user) return res.redirect("/");
-  next();
-}
+
 
 app.post("/login", async (req, res) => {
   const { token } = req.body;
@@ -106,3 +136,5 @@ app.get("/logout", (req, res) => {
 
 
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+
+

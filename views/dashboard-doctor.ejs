@@ -1,0 +1,283 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitals Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbDH8pl82LwrnDo1ixt4U9rqrr_CJ6-4c",
+      authDomain: "patient-data-c7163.firebaseapp.com",
+      projectId: "patient-data-c7163",
+      storageBucket: "patient-data-c7163.firebasestorage.app",
+      messagingSenderId: "805933342233",
+      appId: "1:805933342233:web:4234596c5e705383831488",
+      measurementId: "G-TEBRQLC0TQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const vitalsTableBody = document.getElementById("vitalsTableBody");
+      const charts = {};
+      const ctxs = {
+        heartRate: document.getElementById("heartRateChart").getContext("2d"),
+        bloodPressure: document.getElementById("bloodPressureChart").getContext("2d"),
+        oxygenLevel: document.getElementById("oxygenLevelChart").getContext("2d"),
+        temperature: document.getElementById("temperatureChart").getContext("2d")
+      };
+
+      function updateCharts(vitalsData) {
+        const labels = vitalsData.map(v => new Date(v.timestamp).toLocaleString());
+        const datasets = {
+          heartRate: vitalsData.map(v => v.heartRate),
+          bloodPressure: vitalsData.map(v => parseInt(v.bloodPressure.split('/')[0])),
+          oxygenLevel: vitalsData.map(v => v.oxygenLevel),
+          temperature: vitalsData.map(v => v.temperature)
+        };
+
+        Object.keys(charts).forEach((key) => charts[key]?.destroy());
+
+        Object.keys(ctxs).forEach((key) => {
+          charts[key] = new Chart(ctxs[key], {
+            type: "line",
+            data: {
+              labels,
+              datasets: [{
+                label: key.replace(/([A-Z])/g, ' $1').trim(),
+                data: datasets[key],
+                borderColor: "#4F46E5",
+                fill: false
+              }]
+            }
+          });
+        });
+      }
+
+      function fetchVitals() {
+        getDocs(collection(db, "vitals")).then((querySnapshot) => {
+          let vitalsData = [];
+          vitalsTableBody.innerHTML = "";
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            vitalsData.push(data);
+            const row = `<tr class='border-b'>
+                            <td class='px-4 py-2'>${data.heartRate}</td>
+                            <td class='px-4 py-2'>${data.bloodPressure}</td>
+                            <td class='px-4 py-2'>${data.oxygenLevel}</td>
+                            <td class='px-4 py-2'>${data.temperature}</td>
+                            <td class='px-4 py-2'>${new Date(data.timestamp).toLocaleString()}</td>
+                        </tr>`;
+            vitalsTableBody.innerHTML += row;
+          });
+          updateCharts(vitalsData);
+        });
+      }
+
+      onSnapshot(collection(db, "vitals"), fetchVitals);
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-center mb-4">Vitals Dashboard</h1>
+
+    <div class="overflow-x-auto mt-6">
+      <h2 class="text-lg font-bold text-center mb-4">Vitals Data</h2>
+      <table class="w-full border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="px-4 py-2">Heart Rate</th>
+            <th class="px-4 py-2">Blood Pressure</th>
+            <th class="px-4 py-2">Oxygen Level</th>
+            <th class="px-4 py-2">Temperature</th>
+            <th class="px-4 py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="vitalsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-lg font-bold text-center mb-4">Vitals Trends</h2>
+    <canvas id="heartRateChart" class="mb-6"></canvas>
+    <canvas id="bloodPressureChart" class="mb-6"></canvas>
+    <canvas id="oxygenLevelChart" class="mb-6"></canvas>
+    <canvas id="temperatureChart"></canvas>
+  </div>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitals Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbDH8pl82LwrnDo1ixt4U9rqrr_CJ6-4c",
+      authDomain: "patient-data-c7163.firebaseapp.com",
+      projectId: "patient-data-c7163",
+      storageBucket: "patient-data-c7163.firebasestorage.app",
+      messagingSenderId: "805933342233",
+      appId: "1:805933342233:web:4234596c5e705383831488",
+      measurementId: "G-TEBRQLC0TQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const vitalsTableBody = document.getElementById("vitalsTableBody");
+      const filterDropdown = document.getElementById("filterDropdown");
+      const charts = {};
+      const ctxs = {
+        heartRate: document.getElementById("heartRateChart").getContext("2d"),
+        bloodPressure: document.getElementById("bloodPressureChart").getContext("2d"),
+        oxygenLevel: document.getElementById("oxygenLevelChart").getContext("2d"),
+        temperature: document.getElementById("temperatureChart").getContext("2d")
+      };
+
+      let vitalsData = [];
+
+      function groupData(filter) {
+        if (filter === "all") return vitalsData;
+
+        const groupedData = {};
+        vitalsData.forEach(vital => {
+          const date = new Date(vital.timestamp);
+          let key;
+
+          if (filter === "weekly") {
+            key = `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`;
+          } else if (filter === "daily") {
+            key = date.toISOString().split("T")[0];
+          }
+
+          if (!groupedData[key]) {
+            groupedData[key] = [];
+          }
+          groupedData[key].push(vital);
+        });
+
+        return Object.values(groupedData).flat();
+      }
+
+      function updateCharts(filteredData) {
+        const labels = filteredData.map(v => new Date(v.timestamp).toLocaleString());
+        const datasets = {
+          heartRate: filteredData.map(v => v.heartRate),
+          bloodPressure: filteredData.map(v => parseInt(v.bloodPressure.split('/')[0])),
+          oxygenLevel: filteredData.map(v => v.oxygenLevel),
+          temperature: filteredData.map(v => v.temperature)
+        };
+
+        Object.keys(charts).forEach(key => charts[key]?.destroy());
+
+        Object.keys(ctxs).forEach(key => {
+          charts[key] = new Chart(ctxs[key], {
+            type: "line",
+            data: {
+              labels,
+              datasets: [{
+                label: key.replace(/([A-Z])/g, ' $1').trim(),
+                data: datasets[key],
+                borderColor: ["#E63946", "#457B9D", "#2A9D8F", "#F4A261"][Object.keys(ctxs).indexOf(key)],
+                fill: false
+              }]
+            }
+          });
+        });
+      }
+
+      function updateTable(filteredData) {
+        vitalsTableBody.innerHTML = "";
+        filteredData.forEach(data => {
+          const row = `<tr class='border-b'>
+                        <td class='px-4 py-2'>${data.heartRate}</td>
+                        <td class='px-4 py-2'>${data.bloodPressure}</td>
+                        <td class='px-4 py-2'>${data.oxygenLevel}</td>
+                        <td class='px-4 py-2'>${data.temperature}</td>
+                        <td class='px-4 py-2'>${new Date(data.timestamp).toLocaleString()}</td>
+                    </tr>`;
+          vitalsTableBody.innerHTML += row;
+        });
+      }
+
+      function fetchVitals() {
+        getDocs(collection(db, "vitals")).then(querySnapshot => {
+          vitalsData = [];
+          querySnapshot.forEach(doc => vitalsData.push(doc.data()));
+
+          const selectedFilter = filterDropdown.value;
+          const filteredData = groupData(selectedFilter);
+
+          updateTable(filteredData);
+          updateCharts(filteredData);
+        });
+      }
+
+      filterDropdown.addEventListener("change", fetchVitals);
+
+      onSnapshot(collection(db, "vitals"), fetchVitals);
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold text-center mb-4">Vitals Dashboard</h1>
+
+    <div class="mb-4 text-center">
+      <label for="filterDropdown" class="font-semibold">Filter by:</label>
+      <select id="filterDropdown" class="border p-2 rounded">
+        <option value="all">All</option>
+        <option value="weekly">Weekly</option>
+        <option value="daily">Daily</option>
+      </select>
+    </div>
+
+    <div class="overflow-x-auto mt-6">
+      <h2 class="text-lg font-bold text-center mb-4">Vitals Data</h2>
+      <table class="w-full border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="px-4 py-2">Heart Rate</th>
+            <th class="px-4 py-2">Blood Pressure</th>
+            <th class="px-4 py-2">Oxygen Level</th>
+            <th class="px-4 py-2">Temperature</th>
+            <th class="px-4 py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="vitalsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-lg font-bold text-center mb-4">Vitals Trends</h2>
+    <canvas id="heartRateChart" class="mb-6"></canvas>
+    <canvas id="bloodPressureChart" class="mb-6"></canvas>
+    <canvas id="oxygenLevelChart" class="mb-6"></canvas>
+    <canvas id="temperatureChart"></canvas>
+  </div>
+</body>
+
+</html>

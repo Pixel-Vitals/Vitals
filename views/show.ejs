@@ -1,0 +1,229 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitals Form</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase configuration (Replace with your actual Firebase config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbDH8pl82LwrnDo1ixt4U9rqrr_CJ6-4c",
+      authDomain: "patient-data-c7163.firebaseapp.com",
+      projectId: "patient-data-c7163",
+      storageBucket: "patient-data-c7163.firebasestorage.app",
+      messagingSenderId: "805933342233",
+      appId: "1:805933342233:web:4234596c5e705383831488",
+      measurementId: "G-TEBRQLC0TQ"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Function to fetch and display data
+    function fetchVitals() {
+      const vitalsList = document.getElementById("vitalsList");
+      vitalsList.innerHTML = ""; // Clear existing data
+
+      getDocs(collection(db, "vitals")).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const listItem = document.createElement("li");
+          listItem.className = "border p-3 mb-2 rounded";
+          listItem.innerHTML = `
+                            <strong>Heart Rate:</strong> ${data.heartRate} bpm<br>
+                            <strong>Blood Pressure:</strong> ${data.bloodPressure}<br>
+                            <strong>Oxygen Level:</strong> ${data.oxygenLevel}%<br>
+                            <strong>Temperature:</strong> ${data.temperature}°C<br>
+                        `;
+          vitalsList.appendChild(listItem);
+        });
+      });
+    }
+
+    // Fetch vitals data on page load
+    fetchVitals();
+
+    // Real-time updates (listens for changes in Firestore)
+    onSnapshot(collection(db, "vitals"), () => {
+      fetchVitals();
+    });
+  </script>
+</head>
+
+<body>
+  <h2 class="text-lg font-semibold mt-6">Uploaded Vitals Data</h2>
+  <ul id="vitalsList" class="mt-4"></ul>
+</body>
+
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitals Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Firebase configuration (Replace with your actual Firebase config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCbDH8pl82LwrnDo1ixt4U9rqrr_CJ6-4c",
+      authDomain: "patient-data-c7163.firebaseapp.com",
+      projectId: "patient-data-c7163",
+      storageBucket: "patient-data-c7163.firebasestorage.app",
+      messagingSenderId: "805933342233",
+      appId: "1:805933342233:web:4234596c5e705383831488",
+      measurementId: "G-TEBRQLC0TQ"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const vitalsForm = document.getElementById("vitalsForm");
+      const vitalsTableBody = document.getElementById("vitalsTableBody");
+
+      let chart;
+      const ctx = document.getElementById("vitalsChart").getContext("2d");
+
+      // Function to update the chart
+      function updateChart(vitalsData) {
+        const labels = vitalsData.map((v) => new Date(v.timestamp).toLocaleTimeString());
+        const heartRateData = vitalsData.map((v) => v.heartRate);
+        const oxygenData = vitalsData.map((v) => v.oxygenLevel);
+        const tempData = vitalsData.map((v) => v.temperature);
+
+        if (chart) chart.destroy(); // Destroy previous chart instance
+
+        chart = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              { label: "Heart Rate (bpm)", data: heartRateData, borderColor: "red", fill: false },
+              { label: "Oxygen Level (%)", data: oxygenData, borderColor: "blue", fill: false },
+              { label: "Temperature (°C)", data: tempData, borderColor: "green", fill: false }
+            ]
+          }
+        });
+      }
+
+      // Function to fetch and display vitals
+      function fetchVitals() {
+        getDocs(collection(db, "vitals")).then((querySnapshot) => {
+          let vitalsData = [];
+          vitalsTableBody.innerHTML = "";
+
+          querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            vitalsData.push(data);
+
+            const row = `<tr class="border-b">
+                            <td class="px-4 py-2">${data.heartRate}</td>
+                            <td class="px-4 py-2">${data.bloodPressure}</td>
+                            <td class="px-4 py-2">${data.oxygenLevel}</td>
+                            <td class="px-4 py-2">${data.temperature}</td>
+                            <td class="px-4 py-2">${new Date(data.timestamp).toLocaleTimeString()}</td>
+                        </tr>`;
+            vitalsTableBody.innerHTML += row;
+          });
+
+          updateChart(vitalsData);
+        });
+      }
+
+      // Listen for new data in real-time
+      onSnapshot(collection(db, "vitals"), fetchVitals);
+
+      // Form Submission
+      vitalsForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const heartRate = document.getElementById("heartRate").value;
+        const bloodPressure = document.getElementById("bloodPressure").value;
+        const oxygenLevel = document.getElementById("oxygenLevel").value;
+        const temperature = document.getElementById("temperature").value;
+
+        await addDoc(collection(db, "vitals"), {
+          heartRate: parseInt(heartRate),
+          bloodPressure,
+          oxygenLevel: parseInt(oxygenLevel),
+          temperature: parseFloat(temperature),
+          timestamp: new Date()
+        });
+
+        vitalsForm.reset();
+      });
+
+      fetchVitals();
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-6">
+  <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-xl font-bold text-center mb-4">Vitals Monitoring</h1>
+
+    <!-- Form -->
+    <!-- <form id="vitalsForm" class="space-y-4">
+      <div>
+        <label class="block font-semibold">Heart Rate (bpm)</label>
+        <input type="number" id="heartRate" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <div>
+        <label class="block font-semibold">Blood Pressure (mmHg)</label>
+        <input type="text" id="bloodPressure" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <div>
+        <label class="block font-semibold">Oxygen Level (%)</label>
+        <input type="number" id="oxygenLevel" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <div>
+        <label class="block font-semibold">Temperature (°C)</label>
+        <input type="number" id="temperature" class="w-full px-3 py-2 border rounded" required>
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">Submit</button>
+    </form> -->
+  </div>
+
+  <!-- Data Table -->
+  <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-lg font-bold text-center mb-4">Vitals Data</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse border border-gray-300">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="px-4 py-2">Heart Rate</th>
+            <th class="px-4 py-2">Blood Pressure</th>
+            <th class="px-4 py-2">Oxygen Level</th>
+            <th class="px-4 py-2">Temperature</th>
+            <th class="px-4 py-2">Timestamp</th>
+          </tr>
+        </thead>
+        <tbody id="vitalsTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="max-w-3xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md">
+    <h2 class="text-lg font-bold text-center mb-4">Vitals Trend</h2>
+    <canvas id="vitalsChart"></canvas>
+  </div>
+</body>
+
+</html>
